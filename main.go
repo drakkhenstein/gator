@@ -1,3 +1,5 @@
+package main
+
 import (
     "fmt"
     "log"
@@ -8,9 +10,9 @@ import (
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
-		log.Fatalf("error reading config: %v"err)
+		log.Fatalf("error reading config: %v", err)
 	}
-	fmt.Println("Read config: %+v\n", cfg.)
+	fmt.Println("Read config: %+v\n", cfg)
 
 	err = cfg.SetUser("christian")
 	if err != nil {
