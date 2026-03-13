@@ -51,3 +51,16 @@ func handlerRegister(s *state, cmd command) error {
 	fmt.Println("User created successfully")
 	return nil
 }
+
+func handlerReset(s *state, cmd command) error {
+	err := s.db.DeleteUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("error deleting users: %w", err)
+	}
+	err = s.cfg.SetUser("")
+	if err != nil {
+		return fmt.Errorf("couldn't reset current user: %w", err)
+	}
+	fmt.Println("Users reset successfully")
+	return nil
+}
