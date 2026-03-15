@@ -88,3 +88,30 @@ func handlerAgg(s *state, cmd command) error {
 	fmt.Printf("Feed: %+v\n", feeds)
 	return nil
 }
+
+func handlerAddFeed(s *state, cmd command) error {
+	currentUser, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	if err != nil {
+		return fmt.Errorf("error getting current user: %w", err)
+	}
+
+	if len(cmd.Args) != 2 {
+		return fmt.Errorf("usage: %s <feed name> <feed url>", cmd.Name)
+	}
+	name := cmd.Args[0]
+	url := cmd.Args[1]
+	_, err = s.db.AddFeed(context.Background(), database.AddFeedParams{
+		ID: uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		Name: name,
+		Url: url,
+		UserID: currentUser.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("error adding feed: %w", err)
+	}
+	fmt.Println("Feed added successfully")
+
+	return nil
+}
