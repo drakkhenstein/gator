@@ -81,11 +81,19 @@ func handlerUsers(s *state, cmd command) error {
 }
 
 func handlerAgg(s *state, cmd command) error {
-	feeds, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
-	if err != nil {
-		return fmt.Errorf("error getting feeds: %w", err)
+	if len(cmd.Args) != 1 {
+    return fmt.Errorf("usage: agg <time_between_reqs>")
 	}
-	fmt.Printf("Feed: %+v\n", feeds)
+	time_between_reqs := cmd.Args[0]
+	duration, err := time.ParseDuration(time_between_reqs)
+	if err != nil {
+		return fmt.Errorf("error parsing duration: %w", err)
+	}
+	ticker := time.NewTicker(duration)
+	fmt.Printf("Collecting feeds every %s\n", duration)
+	for ; ; <-ticker.C {
+    scrapeFeeds(s)
+	}
 	return nil
 }
 
