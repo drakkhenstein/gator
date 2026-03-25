@@ -207,3 +207,28 @@ func handlerUnfollow(s *state, cmd command, user database.User) error {
 	fmt.Printf("Unfollowed feed: %s\n", feedToUnfollow.Name)
 	return nil
 }
+
+func handlerBrowse(s *state, cmd command, user database.User) error {
+	limit := 2
+	if len(cmd.Args) > 0 {
+		if n, err := fmt.Sscanf(cmd.Args[0], "%d", &limit); err != nil || n != 1 {
+			return fmt.Errorf("invalid limit: %s", cmd.Args[0])
+		}
+	}
+	posts, err := s.db.GetPostsForUser(context.Background(), database.GetPostsForUserParams{
+		UserID: user.ID,
+		Limit:  int32(limit),
+	})
+	if err != nil {
+		return fmt.Errorf("error getting posts for user: %w", err)
+	}
+	if len(posts) == 0 {
+		fmt.Println("No posts to display. Follow some feeds to see posts here.")
+		return nil
+	}
+	fmt.Printf("Posts for user %s:\n", user.Name)
+	for _, post := range posts {
+		fmt.Printf("Title: %s\nURL: %s\nDescription: %s\nPublished At: %s\nFeed Name: %s\n\n", post.Title, post.Url, post.Description.String, post.PublishedAt.Time.Format(time.RFC1123), post.FeedName)
+	}
+	return nil
+}
